@@ -1,0 +1,44 @@
+---
+# tasks file for my dashboard
+- name: Get latest version of simple dashboard
+  ansible.builtin.uri:
+    url: "{{ dashboard_latest_url }}"
+    return_content: true
+  register: dashboard_latest
+
+- name: Parse the JSON response to get the download URL
+  ansible.builtin.set_fact:
+    download_url: "{{ dashboard_latest.assets[0].browser_download_url }}"
+
+- name: Extract Traefik to /opt/traefik
+  ansible.builtin.get_url:
+    src: "{{ download_url }}"
+    dest: "{{ dashboard_dir }}/dashboard"
+    mode: "0755"
+    owner: root
+    group: root
+  notify: restart dashboard
+
+- name: Ensure templates are deployed on remote
+  ansible.builtin.template:
+    src: "{{ dashboard_config_template }}"
+    dest: "{{ dashboard_dir }}/config.yml"
+    mode: "0644"
+    owner: root
+    group: root
+  notify: restart dashboard
+
+- name: Ensure dashboard service file is on remote
+  ansible.builtin.template:
+    src: dashboard.service.j2
+    dest: /etc/systemd/system/dashboard.service
+    mode: "0664"
+    owner: root
+    group: root
+  notify: restart dashboard
+
+- name: Ensure dashboard service is enabled and started
+  ansible.builtin.systemd:
+    name: dashboard
+    state: started
+    enabled: true

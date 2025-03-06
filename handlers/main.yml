@@ -1,0 +1,8 @@
+---
+# handlers file for dashboard
+- name: restart dashboard
+  ansible.builtin.systemd:
+    name: dashboard
+    state: restarted
+    enabled: true
+    daemon_reload: true
