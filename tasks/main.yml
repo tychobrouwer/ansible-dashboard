@@ -10,9 +10,9 @@
   ansible.builtin.set_fact:
     download_url: "{{ dashboard_latest.json.assets[0].browser_download_url }}"
 
-- name: Extract Traefik to /opt/traefik
+- name: Get simple dashboard binary
   ansible.builtin.get_url:
-    src: "{{ download_url }}"
+    url: "{{ download_url }}"
     dest: "{{ dashboard_dir }}/dashboard"
     mode: "0755"
     owner: root
