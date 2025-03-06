@@ -2,7 +2,7 @@
 After=network.service
 
 [Service]
-WorkingDirectory=
+WorkingDirectory={{ dashboard_dir }}
 ExecStart={{ dashboard_dir }}/dashboard
 Restart=always
 
